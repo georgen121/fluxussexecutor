@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fluxus Executor | Roblox Scripting Tool</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary: #ffcc00; /* Changed to yellow */
+            --primary-dark: #e6b800; /* Darker yellow */
+            --secondary: #ffdd33; /* Lighter yellow */
+            --dark: #000000; /* Changed to pure black */
+            --darker: #0a0a0a; /* Very dark gray */
+            --light: #f8f9fa;
+            --gray: #333333; /* Dark gray */
+            --text: rgba(255, 255, 255, 0.95); /* White text */
+            --text-light: rgba(0, 0, 0, 0.9);
+            --glass: rgba(0, 0, 0, 0.3); /* Darker glass effect */
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Page Container */
+        .page-container {
+            display: none;
+        }
+        
+        .page-container.active {
+            display: block;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.2;
+            color: white; /* Ensure headings are white */
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+        }
+
+        p {
+            font-size: clamp(1rem, 1.2vw, 1.1rem);
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            color: white; /* Ensure paragraphs are white */
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: white; /* Ensure list items are white */
+        }
+
+        /* Layout Components */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--primary);
+            color: black; /* Changed to black for better contrast with yellow */
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 1000;
+            background: var(--darker);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+        }
+
+        .logo span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            position: relative;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: white; /* Ensure nav links are white */
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding-top: 150px;
+            padding-bottom: 100px;
+            background: linear-gradient(to right, var(--darker), var(--dark));
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 50px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        .hero-title {
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        .hero-title span {
+            color: var(--primary);
+        }
+
+        .hero-subtitle {
+            max-width: 600px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 1.2rem;
+        }
+
+        .hero-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .hero-img {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Features Section */
+        .features {
+            background: var(--darker);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: var(--glass-highlight);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .feature-title {
+            margin-bottom: 15px;
+        }
+
+        /* About Section */
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 80px;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-image {
+            flex: 1;
+        }
+
+        .about-img {
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        /* FAQ Section */
+        .faq {
+            background: var(--darker);
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            background: var(--glass);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: white; /* Ensure FAQ questions are white */
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            color: white; /* Ensure FAQ answers are white */
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+
+        /* Download Section */
+        .download-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: black; /* Changed to black for better contrast with yellow */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            color: white; /* Ensure table text is white */
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid var(--glass-border);
+        }
+
+        .comparison-table th {
+            background-color: var(--glass);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: var(--glass);
+        }
+
+        /* Requirements Table */
+        .requirements-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            color: white; /* Ensure table text is white */
+        }
+
+        .requirements-table th, .requirements-table td {
+            padding: 15px;
+            text-align: left;
+            border: 1px solid var(--glass-border);
+        }
+
+        .requirements-table th {
+            background-color: var(--glass);
+            font-weight: 600;
+        }
+
+        /* Legal Pages */
+        .legal-content {
+            max-width: 800px;
+            margin: 0 auto;
+            color: white; /* Ensure legal text is white */
+        }
+
+        .legal-content h2 {
+            margin: 30px 0 15px;
+        }
+
+        .legal-content h3 {
+            margin: 25px 0 10px;
+        }
+
+        /* Footer */
+        footer {
+            background: #0a0a0a;
+            padding: 80px 0 30px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+            margin-bottom: 60px;
+        }
+
+        .footer-col {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+            color: var(--primary);
+        }
+
+        .footer-about {
+            margin-bottom: 20px;
+            color: white; /* Ensure footer text is white */
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            color: white; /* Ensure social icons are white */
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+            color: black; /* Change to black on hover for contrast */
+        }
+
+        .footer-title {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: white; /* Ensure footer titles are white */
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: white; /* Ensure footer links are white */
+        }
+
+        .footer-link:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            color: white; /* Ensure footer bottom text is white */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 0 30px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero-content, .about-content {
+                flex-direction: column;
+            }
+            
+            .hero-text, .about-text {
+                text-align: center;
+            }
+            
+            .hero-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .hero-actions {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background: var(--darker);
+                flex-direction: column;
+                align-items: center;
+                padding: 20px 0;
+                gap: 20px;
+                transform: translateY(-150%);
+                transition: transform 0.3s ease;
+                z-index: 999;
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            section {
+                padding: 80px 0;
+            }
+
+            .comparison-table, .requirements-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 20px;
+            }
+            
+            .hero {
+                padding-top: 120px;
+            }
+            
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo" onclick="showPage('home')">Fluxus<span></span></a>
+                
+                <div class="nav-links" id="navLinks">
+                    <a href="#" onclick="showPage('home')">Home</a>
+                    <a href="#" onclick="showPage('pc')">Fluxus PC</a>
+                    <a href="#" onclick="showPage('features')">Features</a>
+                    <a href="#" onclick="showPage('about')">About</a>
+                    <a href="#" onclick="showPage('disclaimer')">Disclaimer</a>
+                    <a href="#" onclick="showPage('privacy')">Privacy Policy</a>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page-container active">
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Fluxus Executor <span>APK</span></h1>
+                        <p class="hero-subtitle">Download for Roblox on Android</p>
+                        <p>Fluxus Executor is one of the most powerful and reliable Roblox script executors available for Android users. If you're into modifying gameplay with advanced Lua scripts, this tool is built just for you. It supports a wide range of popular games and is frequently updated to stay compatible with Roblox's latest versions.</p>
+                        <div style="margin-top: 40px;">
+                            <a href="https://fluxussexecutor.com/" class="btn">Download Fluxus Executor</a>
+                            <a href="https://f004.backblazeb2.com/file/Fluxussexecutor/Fluxus-Executor.html" class="btn" style="margin-left: 15px; background: var(--glass); border: 1px solid var(--primary); color: var(--primary);">Download APK</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://fluxussexecutor.com/wp-content/uploads/2025/07/Fluxus-Executor.webp" alt="Fluxus Executor" class="hero-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2 class="section-title">What Is Fluxus Executor?</h2>
+                        <p>Fluxus is a free Roblox script executor specifically designed for Android. It allows users to run powerful Lua scripts in Roblox games without a PC. Whether you're into auto farming, teleport hacks, or just want to have fun experimenting with scripts like Owl Hub or Infinite Yield, Fluxus gives you everything you need to take control of your gameplay.</p>
+                        <p>You don't need any coding skills — just paste a script and hit execute. The user-friendly interface and lightweight design make it accessible even for beginners.</p>
+                    </div>
+                    <div class="about-image">
+             
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Key Features</h2>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">👶</div>
+                        <h3 class="feature-title">Beginner-Friendly UI</h3>
+                        <p>Designed with simplicity in mind, so you can focus on your scripts, not navigating menus.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Robust Script Engine</h3>
+                        <p>Built to support even the most complex Lua scripts used in popular Roblox games.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📚</div>
+                        <h3 class="feature-title">Preloaded Script Hub</h3>
+                        <p>Comes with a script library so you don't need to search the web every time.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">✏️</div>
+                        <h3 class="feature-title">Built-in Script Editor</h3>
+                        <p>Easily paste, edit, or create scripts directly inside the app.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">Active Development</h3>
+                        <p>Regularly updated to stay compatible with Roblox patches.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">💻</div>
+                        <h3 class="feature-title">Cross-Platform</h3>
+                        <p>Besides Android, it works on Windows and Linux for a seamless experience across devices.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Download Section -->
+        <section class="download">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">How to Use Fluxus</h2>
+                </div>
+                
+                <div class="download-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <p>Open the app and launch your desired Roblox game.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <p>Paste your script into the built-in editor or choose one from the script hub.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <p>Tap Execute and enjoy the modified gameplay.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <p>Scripts execute in real-time, giving you instant results. Whether it's flying in Brookhaven or auto farming in Blox Fruits, it all becomes possible with just a few taps.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tips Section -->
+        <section class="features" style="background: var(--dark);">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Tips for Best Experience</h2>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3 class="feature-title">Keep Updated</h3>
+                        <p>Keep your app updated to avoid script execution errors.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3 class="feature-title">Trusted Sources</h3>
+                        <p>Always download from trusted sources.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h3 class="feature-title">Join Community</h3>
+                        <p>Join the official community or Discord for script recommendations and technical help.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🚫</div>
+                        <h3 class="feature-title">Avoid Overuse</h3>
+                        <p>Avoid overusing cheats in public servers to prevent account flags.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pros/Cons Section -->
+        <section class="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2 class="section-title">Pros and Cons</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                            <div>
+                                <h3 style="color: var(--primary); margin-bottom: 15px;">Pros</h3>
+                                <ul style="list-style-type: none;">
+                                    <li style="margin-bottom: 10px;">✔️ Completely free to use</li>
+                                    <li style="margin-bottom: 10px;">✔️ Works with all major Roblox games</li>
+                                    <li style="margin-bottom: 10px;">✔️ Simple interface suitable for beginners</li>
+                                    <li style="margin-bottom: 10px;">✔️ Has built-in script library</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Cons</h3>
+                                <ul style="list-style-type: none;">
+                                    <li style="margin-bottom: 10px;">❌ Not available on iOS</li>
+                                    <li style="margin-bottom: 10px;">❌ Requires ads-based key system</li>
+                                    <li style="margin-bottom: 10px;">❌ Frequent updates required</li>
+                                    <li style="margin-bottom: 10px;">❌ Not available on Google Play Store</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                   
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Words -->
+        <section class="hero" style="padding: 80px 0; background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: black;">
+            <div class="container">
+                <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                    <h2 style="margin-bottom: 20px;">Final Words</h2>
+                    <p style="margin-bottom: 30px; font-size: 1.2rem;">Fluxus Executor is hands-down one of the best mobile script executors available for Roblox enthusiasts. With its strong features, active updates, and easy-to-use design, it opens up a whole new dimension for gamers who want more control over their experience.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Fluxus PC Page -->
+    <div id="pc-page" class="page-container">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1 class="hero-title">Fluxus Executor <span>PC</span></h1>
+                        <p class="hero-subtitle">Download for Windows & Linux (2025)</p>
+                        <p>Fluxus Executor PC is an excellent choice for Roblox players transitioning from Android to a larger screen setup. Whether you're tired of squinting at a phone or simply want smoother performance, switching to PC brings better visuals and faster script execution — all without the usual mobile limitations.</p>
+                    </div>
+                    <div class="hero-image">
+                        <img src="https://res.cloudinary.com/dtz0urit6/image/upload/f_webp,q_auto/cloudinary-tools-uploads/jsjwheljrdw6p7m7khlq.webp
